@@ -8,10 +8,11 @@ args = ARGV
 case ARGV[0]
 when '-c'
   archive.insert ARGV[1..-2], ARGV.last, Dir.pwd
-  'no data' if ARGV.length < 3
+  p 'no data' if ARGV.length < 3
 when '-d'
   archive.extract ARGV.last, Dir.pwd
-  'no data' if ARGV.length < 2
+  p 'no data' if ARGV.length < 2
+  p 'too much data' if ARGV.length > 2
 else
   p 'there is no key'
 end

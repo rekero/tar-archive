@@ -6,7 +6,9 @@ module TarArchive
       out = File.open(path + '/' + output, 'w')
       files.flatten.each do |file_name|
         name = file_name
-        file = File.open(path+ '/' +name, 'r')
+        full_file_name = path + '/' + name
+        raise 'no file' unless File.exist?(full_file_name)
+        file = File.open(full_file_name, 'r')
         if name.length > 100
             raise "file name is too long" if name.length > 255
             name, prefix = file[0..99], file[100..-1]
@@ -59,7 +61,9 @@ module TarArchive
     end
 
     def extract(output, path)
-      out = File.open(path + '/' + output, 'r')
+      file_name = path + '/' + output
+      raise 'no file' unless File.exist?(file_name)
+      out = File.open(file_name, 'r')
       until out.eof?
         while header = get_header(out)
           file = File.open(path + '/' + header[:name] + header[:prefix], 'w+')
@@ -90,7 +94,8 @@ module TarArchive
     end
 
     def checksum(header)
-      "%.6o\0 " % header.each_byte.inject(:+)
+      "%.6o\0 " % (header[0..147] + header[156..500]).each_byte.inject(32*8, :+)
+      # we should count checksum as eight zeroes
     end
   end
 end
